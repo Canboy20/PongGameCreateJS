@@ -1,0 +1,198 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
+<script type="text/javascript" src="Paddle.js"></script>
+<script type="text/javascript" src="PongBall.js"></script>
+<script>
+
+/*** Candidate name: IRFAN CAN ATAY   Applying for: Gazeus games - Game Developer   Game:Pong   Framework used: CreateJS ***/
+
+var canvasWidth, canvasHeight;
+
+var canvas;
+
+//Stage will be created with canvas
+var stage;
+
+var messageField;
+var shapeCreator;
+
+
+//OBJECTS! Keeps instance of Paddles and the pong ball
+var playerPaddle;
+var robotPaddle;
+var pongBall;
+
+//Will be used to check whether up or down key is being pressed and perform movement accordingly
+var performMoveUp=false;			//is UP being pressed
+var performMoveDown=false;			//is DOWN being pressed
+
+
+//Keycodes that will used to move paddle up and down
+var KEYCODE_UP = 38;
+var KEYCODE_DOWN = 40;
+
+//PI number
+var pi=Math.PI;
+
+//Score holders
+var playerScore=0;
+var robotScore=0;
+var playerScoreDisplayField;
+var robotScoreDisplayField;
+
+
+//register key functions
+document.onkeydown = handleKeyDown;
+document.onkeyup = handleKeyUp;
+
+
+function init() {
+
+        //Grabs the canvas and adds it to the stage
+	    canvas = document.getElementById("gameCanvas");
+		stage = new createjs.Stage(canvas);
+
+
+		// grab canvas width and height for later calculations:
+		canvasWidth = stage.canvas.width;
+		canvasHeight = stage.canvas.height;
+
+
+		//Adds score fields to stage
+		playerScoreDisplayField = new createjs.Text(playerScore.toString() , "bold 30px Arial", "#FFFFFF");
+		playerScoreDisplayField.maxWidth = 100;
+		playerScoreDisplayField.textAlign = "center";
+		playerScoreDisplayField.textBaseline = "middle";
+		playerScoreDisplayField.x = (canvasWidth / 2) - 20;
+		playerScoreDisplayField.y = canvasHeight / 2;
+		stage.addChild(playerScoreDisplayField);
+
+		robotScoreDisplayField = new createjs.Text(robotScore.toString() , "bold 30px Arial", "#FFFFFF");
+		robotScoreDisplayField.maxWidth = 100;
+		robotScoreDisplayField.textAlign = "center";
+		robotScoreDisplayField.textBaseline = "middle";
+		robotScoreDisplayField.x = (canvasWidth / 2) + 20;
+		robotScoreDisplayField.y = canvasHeight / 2;
+		stage.addChild(robotScoreDisplayField);
+
+      
+
+        //Draws a white line in midddle of screen
+		shapeCreator= new createjs.Shape();
+		shapeCreator.graphics.beginFill("white").drawRect(canvasWidth/2, 0, 1, 600);
+		stage.addChild(shapeCreator);
+
+
+		//Paddle Objects
+        playerPaddle = new Paddle(false);
+		playerPaddle.x = 10;
+	    playerPaddle.y = (canvas.height / 2) - 50;
+
+	    robotPaddle = new Paddle(true);
+		robotPaddle.x = canvas.width - 30;
+	    robotPaddle.y = (canvas.height/2 ) - 50;
+
+
+        //Pong Ball Object
+        pongBall = new PongBall();
+		pongBall.x = canvas.width / 2;
+	    pongBall.y = canvas.height / 2;
+	    pongBall.respawnBall(1);
+
+        
+	    stage.clear();
+        
+        //Adds objects to the stage so they can be drawn
+	    stage.addChild(playerPaddle);
+	    stage.addChild(robotPaddle);
+	    stage.addChild(pongBall);
+
+        //Draws the graphics of the objects to the stage 
+        stage.update(); 
+
+        //Will activate tickers (heartbeats). Will update the positions of paddles, pongball in each call
+		createjs.Ticker.timingMode = createjs.Ticker.RAF;
+	    createjs.Ticker.addEventListener("tick", tick);
+	}
+
+
+
+
+function tick(event) {
+
+	//Moves paddle up when pressing up key
+	if (performMoveUp) {
+		playerPaddle.movePaddleUp();
+	}
+
+    //Moves paddle down when pressing down key
+	if (performMoveDown) {
+		playerPaddle.movePaddleDown();
+	}
+
+
+    //Will update position of objects every call according to their speed
+    playerPaddle.tick(event);
+    robotPaddle.tick(event);
+    pongBall.tick(event);
+
+
+    //Re-draws objects above with updated positions
+	stage.update(event);
+}
+
+
+
+
+
+
+function handleKeyDown(e) {
+		//cross browser issues exist
+		if (!e) {
+			var e = window.event;
+		}
+		switch (e.keyCode) {			
+			case KEYCODE_UP:
+				performMoveUp = true;
+				return false;
+			case KEYCODE_DOWN:
+				performMoveDown = true;
+				return false;			
+		}
+	}
+
+
+
+	function handleKeyUp(e) {
+		//cross browser issues exist
+		if (!e) {
+			var e = window.event;
+		}
+		switch (e.keyCode) {
+			case KEYCODE_UP:
+				performMoveUp = false;
+				break;
+			case KEYCODE_DOWN:
+				performMoveDown = false;
+				break;	
+		}
+	}
+
+
+   </script>
+</head>
+
+
+<body onload="init();">
+
+<div id="content">
+	<canvas id="gameCanvas" width="700" height="600"
+			style="background:black;"></canvas>
+</div>
+
+</body>
+</html>
